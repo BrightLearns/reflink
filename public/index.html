@@ -106,12 +106,24 @@
         .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg-card); border: 1px solid var(--green-primary); border-radius: 10px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
         .toast.error { border-color: var(--danger); }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+        .footer { text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+        .terms-section { max-width: 600px; margin: 3rem auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+        .terms-section h3 { font-size: 1.25rem; margin-bottom: 1.5rem; text-align: center; background: linear-gradient(135deg, var(--purple-primary), var(--green-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .reward-tiers { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+        .reward-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 10px; border: 1px solid var(--border); }
+        .reward-icon { font-size: 1.75rem; }
+        .reward-details strong { display: block; color: var(--text-primary); margin-bottom: 0.25rem; }
+        .reward-details p { color: var(--green-light); font-size: 0.9rem; margin: 0; }
+        .terms-note { padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: 10px; border: 1px solid var(--purple-dark); }
+        .terms-note p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.5; }
+        .terms-note p:last-child { margin-bottom: 0; }
+        .terms-disclaimer { font-size: 0.75rem !important; color: var(--text-muted) !important; font-style: italic; }
         @media (max-width: 768px) {
             .container { padding: 1rem; }
             .hero-title { font-size: 2rem; }
             .form-card { padding: 1.5rem; }
             .share-buttons { flex-direction: column; }
+            .terms-section { padding: 1.5rem; }
         }
     </style>
 </head>
@@ -176,6 +188,46 @@
         <footer class="footer">
             <p>Shack Referral &copy; 2025</p>
         </footer>
+
+        <div class="terms-section">
+            <h3>💰 Referral Rewards</h3>
+            <div class="terms-content">
+                <div class="reward-tiers">
+                    <div class="reward-item">
+                        <span class="reward-icon">🥉</span>
+                        <div class="reward-details">
+                            <strong>1-4 Referrals</strong>
+                            <p>₦100 per confirmed referral</p>
+                        </div>
+                    </div>
+                    <div class="reward-item">
+                        <span class="reward-icon">🥈</span>
+                        <div class="reward-details">
+                            <strong>5-9 Referrals</strong>
+                            <p>₦150 per referral (1.5x bonus)</p>
+                        </div>
+                    </div>
+                    <div class="reward-item">
+                        <span class="reward-icon">🥇</span>
+                        <div class="reward-details">
+                            <strong>10-19 Referrals</strong>
+                            <p>₦200 per referral (2x bonus)</p>
+                        </div>
+                    </div>
+                    <div class="reward-item">
+                        <span class="reward-icon">💎</span>
+                        <div class="reward-details">
+                            <strong>20+ Referrals</strong>
+                            <p>₦200 per referral + one-time 50% cash withdrawal!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="terms-note">
+                    <p><strong>How it works:</strong> Your bonus is added to your Shack Auction dashboard and can be used for placing bids. At 20+ referrals, you unlock a one-time withdrawal of 50% of your total earnings.</p>
+                    <p class="terms-disclaimer">Terms and conditions may be updated at any time.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-message"></span></div>
