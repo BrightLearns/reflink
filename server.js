@@ -57,7 +57,15 @@ validateEnv();
 // ===================
 // DATABASE SETUP
 // ===================
-const db = new Database('./reflink.db');
+// Use persistent volume path if available (Railway), otherwise local
+const fs = require('fs');
+const dbDir = process.env.NODE_ENV === 'production' ? '/app/data' : '.';
+if (process.env.NODE_ENV === 'production' && !fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+}
+const dbPath = `${dbDir}/reflink.db`;
+console.log(`📂 Database path: ${dbPath}`);
+const db = new Database(dbPath);
 
 // Enable WAL mode for better performance and reliability
 db.pragma('journal_mode = WAL');
