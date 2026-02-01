@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RefLink - WhatsApp Referral Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green-primary: #25D366;
+            --green-dark: #128C7E;
+            --green-light: #DCF8C6;
+            --bg-dark: #0a0f0d;
+            --bg-card: #111916;
+            --bg-card-hover: #1a2420;
+            --text-primary: #e8f5e9;
+            --text-secondary: #81c784;
+            --text-muted: #5a7d62;
+            --border: #2d4a3e;
+            --danger: #ff6b6b;
+            --warning: #ffd93d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Instrument Sans', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: radial-gradient(ellipse at 20% 0%, rgba(37, 211, 102, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(18, 140, 126, 0.06) 0%, transparent 50%);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--green-primary), var(--green-dark)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .logo-text { font-size: 1.75rem; font-weight: 700; }
+        .logo-text span { color: var(--green-primary); }
+        .nav-tabs { display: flex; gap: 0.5rem; background: var(--bg-card); padding: 0.35rem; border-radius: 10px; border: 1px solid var(--border); }
+        .nav-tab { padding: 0.65rem 1.25rem; border: none; background: transparent; color: var(--text-muted); font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .nav-tab:hover { color: var(--text-primary); }
+        .nav-tab.active { background: var(--green-primary); color: var(--bg-dark); }
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hero-section { text-align: center; max-width: 600px; margin: 0 auto 3rem; }
+        .hero-title { font-size: 2.75rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.1; }
+        .hero-title span { background: linear-gradient(135deg, var(--green-primary), var(--green-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2.5rem; }
+        .form-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 480px; margin: 0 auto; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input { width: 100%; padding: 0.9rem 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-family: 'Space Mono', monospace; font-size: 1rem; transition: all 0.2s; }
+        .form-input:focus { outline: none; border-color: var(--green-primary); box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15); }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; }
+        .form-hint.error { color: var(--danger); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.9rem 1.5rem; border: none; border-radius: 10px; font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { background: linear-gradient(135deg, var(--green-primary), var(--green-dark)); color: white; width: 100%; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3); }
+        .btn-secondary { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg-card-hover); }
+        .btn-small { padding: 0.5rem 1rem; font-size: 0.85rem; }
+        .btn-danger { background: var(--danger); color: white; }
+        .link-result { display: none; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .link-result.show { display: block; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .link-result h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem; text-align: center; }
+        .link-box { background: var(--bg-dark); border: 1px solid var(--green-primary); border-radius: 10px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .link-text { flex: 1; font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--green-light); word-break: break-all; user-select: all; }
+        .copy-btn { background: var(--green-primary); color: var(--bg-dark); border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; flex-shrink: 0; }
+        .copy-btn:hover { background: var(--green-light); }
+        .copy-btn.copied { background: var(--text-secondary); }
+        .share-buttons { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+        .share-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; }
+        .share-whatsapp { background: var(--green-primary); color: white; }
+        .share-whatsapp:hover { background: #20bd5a; transform: translateY(-2px); }
+        .share-copy { background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-primary); }
+        .share-copy:hover { border-color: var(--green-primary); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .dashboard-title { font-size: 1.5rem; font-weight: 600; }
+        .dashboard-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--green-primary); font-family: 'Space Mono', monospace; }
+        .stat-value.warning { color: var(--warning); }
+        .log-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+        .log-section h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--text-secondary); }
+        .log-form { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end; }
+        .log-form .form-group { margin-bottom: 0; }
+        .log-form .btn { height: 46px; }
+        .table-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 2rem; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
+        .table-header h3 { font-size: 1rem; color: var(--text-secondary); }
+        .table-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+        .search-input { padding: 0.5rem 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: inherit; font-size: 0.9rem; width: 200px; }
+        .search-input:focus { outline: none; border-color: var(--green-primary); }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem 1.5rem; text-align: left; }
+        th { background: var(--bg-dark); font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        td { border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        tr:hover td { background: var(--bg-card-hover); }
+        .referrer-code { font-family: 'Space Mono', monospace; color: var(--green-primary); font-weight: 600; }
+        .referral-count { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 28px; background: rgba(37, 211, 102, 0.15); border-radius: 6px; font-family: 'Space Mono', monospace; font-weight: 600; color: var(--green-primary); }
+        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .badge-bronze { background: #cd7f32; color: white; }
+        .badge-silver { background: #c0c0c0; color: #333; }
+        .badge-gold { background: linear-gradient(135deg, #ffd700, #ffb700); color: #333; }
+        .badge-platinum { background: linear-gradient(135deg, #e5e4e2, #a8a8a8); color: #333; }
+        .badge-flagged { background: var(--danger); color: white; }
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .action-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 0.35rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; margin-right: 0.25rem; }
+        .action-btn:hover { border-color: var(--text-primary); color: var(--text-primary); }
+        .action-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+        .action-btn.flag:hover { border-color: var(--warning); color: var(--warning); }
+        .leaderboard-list { padding: 0.5rem 0; }
+        .leaderboard-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+        .leaderboard-item:hover { background: var(--bg-card-hover); }
+        .leaderboard-item:last-child { border-bottom: none; }
+        .rank { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 700; font-family: 'Space Mono', monospace; }
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb700); color: #333; }
+        .rank-2 { background: #c0c0c0; color: #333; }
+        .rank-3 { background: #cd7f32; color: white; }
+        .rank-default { background: var(--bg-dark); color: var(--text-muted); }
+        .leaderboard-info { flex: 1; }
+        .leaderboard-name { font-weight: 600; margin-bottom: 0.2rem; }
+        .leaderboard-tier { font-size: 0.8rem; color: var(--text-muted); }
+        .leaderboard-count { font-size: 1.5rem; font-weight: 700; color: var(--green-primary); font-family: 'Space Mono', monospace; }
+        .admin-auth { max-width: 400px; margin: 4rem auto; }
+        .admin-auth h2 { text-align: center; margin-bottom: 1.5rem; }
+        .security-info { background: rgba(37, 211, 102, 0.1); border: 1px solid var(--green-dark); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-secondary); }
+        .security-info ul { margin: 0.5rem 0 0 1.25rem; }
+        .password-strength { height: 4px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+        .password-strength-bar { height: 100%; width: 0; transition: width 0.3s, background 0.3s; }
+        .strength-weak { width: 25%; background: var(--danger); }
+        .strength-fair { width: 50%; background: var(--warning); }
+        .strength-good { width: 75%; background: #8bc34a; }
+        .strength-strong { width: 100%; background: var(--green-primary); }
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg-card); border: 1px solid var(--green-primary); border-radius: 10px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; max-width: 400px; }
+        .toast.error { border-color: var(--danger); }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .modal h3 { margin-bottom: 1rem; }
+        .modal p { color: var(--text-secondary); margin-bottom: 1rem; }
+        .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .modal-actions .btn { flex: 1; }
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header { flex-direction: column; gap: 1rem; }
+            .hero-title { font-size: 2rem; }
+            .form-card { padding: 1.5rem; }
+            .log-form { grid-template-columns: 1fr; }
+            .share-buttons { flex-direction: column; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">📨</div>
+                <div class="logo-text">Ref<span>Link</span></div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-view="get-link">Get Link</button>
+                <button class="nav-tab" data-view="leaderboard">Leaderboard</button>
+                <button class="nav-tab" data-view="admin">Admin</button>
+            </nav>
+        </header>
+
+        <div id="get-link" class="view active">
+            <div class="hero-section">
+                <h1 class="hero-title">Get Your <span>Referral Link</span></h1>
+                <p class="hero-subtitle">Share your unique link and track how many people you bring to our WhatsApp community</p>
+            </div>
+            <div class="form-card">
+                <form id="referral-form">
+                    <div class="form-group">
+                        <label class="form-label">Your Referral Code</label>
+                        <input type="text" class="form-input" id="referral-code" placeholder="e.g. BRIGHT or JOHN2024" maxlength="20" autocomplete="off" required>
+                        <p class="form-hint" id="code-hint">2-20 characters: letters, numbers, underscores</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="generate-btn"><span>✨</span> Generate My Link</button>
+                </form>
+                <div class="link-result" id="link-result">
+                    <h3>🎉 Your Referral Link is Ready!</h3>
+                    <div class="link-box">
+                        <span class="link-text" id="generated-link"></span>
+                        <button type="button" class="copy-btn" id="copy-link-btn">Copy</button>
+                    </div>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn share-whatsapp" id="share-whatsapp-btn" target="_blank" rel="noopener">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            Share on WhatsApp
+                        </a>
+                        <button type="button" class="share-btn share-copy" id="copy-share-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy Link
+                        </button>
+                    </div>
+                    <p class="form-hint" style="text-align: center; margin-top: 1rem;">When someone uses your link, they'll message us with your code!</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="leaderboard" class="view">
+            <div class="table-section">
+                <div class="table-header"><h3>🏆 Top Referrers</h3></div>
+                <div class="leaderboard-list" id="leaderboard-list"><div class="empty-state">Loading...</div></div>
+            </div>
+        </div>
+
+        <div id="admin" class="view">
+            <div id="admin-login" class="admin-auth">
+                <h2>🔐 Admin Access</h2>
+                <div class="form-card">
+                    <div class="security-info">
+                        <strong>Security Notice:</strong>
+                        <ul><li>Account locks after 5 failed attempts</li><li>Sessions expire after 8 hours</li><li>All actions are logged</li></ul>
+                    </div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" id="admin-username" placeholder="Enter username" autocomplete="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="admin-password" placeholder="Enter password" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="login-btn">Access Dashboard</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="admin-dashboard" style="display: none;">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">📊 Referral Dashboard</h2>
+                    <div class="dashboard-actions">
+                        <button type="button" class="btn btn-secondary btn-small" id="export-csv-btn">📥 Export</button>
+                        <button type="button" class="btn btn-secondary btn-small" id="refresh-btn">🔄 Refresh</button>
+                        <button type="button" class="btn btn-secondary btn-small" id="change-password-btn">🔑 Password</button>
+                        <button type="button" class="btn btn-secondary btn-small" id="logout-btn">Logout</button>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-label">Total Referrals</div><div class="stat-value" id="stat-total">-</div></div>
+                    <div class="stat-card"><div class="stat-label">Active Referrers</div><div class="stat-value" id="stat-referrers">-</div></div>
+                    <div class="stat-card"><div class="stat-label">Today</div><div class="stat-value" id="stat-today">-</div></div>
+                    <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-value" id="stat-week">-</div></div>
+                    <div class="stat-card"><div class="stat-label">Flagged</div><div class="stat-value warning" id="stat-flagged">-</div></div>
+                </div>
+                <div class="log-section">
+                    <h3>⚡ Quick Log - Paste WhatsApp Message</h3>
+                    <div class="form-group" style="margin-bottom:1rem">
+                        <input type="text" class="form-input" id="quick-paste" placeholder="Paste: Hi! I was referred by BRIGHT" style="font-family:inherit">
+                        <p class="form-hint">Paste the whole message - code extracts automatically</p>
+                    </div>
+                    <h3 style="margin-top:1.5rem">➕ Or Manual Entry</h3>
+                    <form class="log-form" id="log-form">
+                        <div class="form-group"><label class="form-label">Referrer Code *</label><input type="text" class="form-input" id="log-code" placeholder="e.g. BRIGHT" maxlength="20" required></div>
+                        <div class="form-group"><label class="form-label">Member Name</label><input type="text" class="form-input" id="log-name" placeholder="Optional" maxlength="100"></div>
+                        <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" id="log-phone" placeholder="Optional" maxlength="20"></div>
+                        <button type="submit" class="btn btn-primary" id="log-btn">Log</button>
+                    </form>
+                </div>
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3>📋 All Referrers</h3>
+                        <div class="table-actions">
+                            <select class="search-input" id="filter-flagged" style="width: 140px;"><option value="">All</option><option value="false">Active</option><option value="true">Flagged</option></select>
+                            <input type="text" class="search-input" id="search-input" placeholder="Search..." maxlength="20">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table><thead><tr><th>Code</th><th>Referrals</th><th>Tier</th><th>Status</th><th>Last Activity</th><th>Actions</th></tr></thead><tbody id="referrers-table"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-message"></span></div>
+
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <h3>⚠️ Confirm Delete</h3>
+            <p>Delete <strong id="delete-code"></strong> and all referrals?</p>
+            <p style="color: var(--danger); font-size: 0.9rem;">This cannot be undone.</p>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" id="cancel-delete">Cancel</button><button type="button" class="btn btn-danger" id="confirm-delete">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="flag-modal">
+        <div class="modal">
+            <h3 id="flag-modal-title">🚩 Flag Referrer</h3>
+            <p>Code: <strong id="flag-code"></strong></p>
+            <div class="form-group" id="flag-reason-group"><label class="form-label">Reason</label><input type="text" class="form-input" id="flag-reason" placeholder="Optional" maxlength="200"></div>
+            <div class="modal-actions"><button type="button" class="btn btn-secondary" id="cancel-flag">Cancel</button><button type="button" class="btn btn-primary" id="confirm-flag">Confirm</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="password-modal">
+        <div class="modal">
+            <h3>🔑 Change Password</h3>
+            <form id="password-form">
+                <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="current-password" required></div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-input" id="new-password" minlength="12" required>
+                    <div class="password-strength"><div class="password-strength-bar" id="password-strength-bar"></div></div>
+                    <p class="form-hint">Min 12 chars with upper, lower, number, symbol</p>
+                </div>
+                <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-input" id="confirm-password" required></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" id="cancel-password">Cancel</button><button type="submit" class="btn btn-primary">Change</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+        let CONFIG = { whatsappNumber: '', tiers: {} };
+
+        async function api(endpoint, options = {}) {
+            const res = await fetch('/api' + endpoint, { headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', ...options });
+            if (res.status === 401) { showLogin(); throw new Error('Please log in'); }
+            if (res.status === 429) throw new Error('Too many requests');
+            if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Failed'); }
+            return res.headers.get('Content-Type')?.includes('text/csv') ? res.blob() : res.json();
+        }
+
+        function showToast(msg, err = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-icon').textContent = err ? '✕' : '✓';
+            document.getElementById('toast-message').textContent = msg;
+            t.classList.toggle('error', err);
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        function getTier(c) {
+            if (c >= CONFIG.tiers.platinum) return { n: 'Platinum', c: 'badge-platinum' };
+            if (c >= CONFIG.tiers.gold) return { n: 'Gold', c: 'badge-gold' };
+            if (c >= CONFIG.tiers.silver) return { n: 'Silver', c: 'badge-silver' };
+            if (c >= CONFIG.tiers.bronze) return { n: 'Bronze', c: 'badge-bronze' };
+            return null;
+        }
+        function fmtDate(d) { return d ? new Date(d).toLocaleDateString() : '-'; }
+        function setLoading(btn, l) { btn.disabled = l; btn.innerHTML = l ? '<span class="spinner"></span>' : (btn.dataset.text || btn.innerHTML); if (!l && !btn.dataset.text) return; if (l) btn.dataset.text = btn.innerHTML; }
+
+        document.querySelectorAll('.nav-tab').forEach(t => t.addEventListener('click', () => {
+            document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+            t.classList.add('active');
+            document.getElementById(t.dataset.view).classList.add('active');
+            if (t.dataset.view === 'leaderboard') loadLeaderboard();
+            if (t.dataset.view === 'admin') checkAuth();
+        }));
+
+        let generatedLink = '';
+        document.getElementById('referral-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('generate-btn'), code = document.getElementById('referral-code').value.trim();
+            if (!/^[a-zA-Z0-9_]{2,20}$/.test(code)) { document.getElementById('code-hint').textContent = '❌ Invalid'; document.getElementById('code-hint').classList.add('error'); return; }
+            document.getElementById('code-hint').classList.remove('error');
+            setLoading(btn, true);
+            try {
+                const r = await api('/referrers', { method: 'POST', body: JSON.stringify({ code }) });
+                generatedLink = r.link;
+                document.getElementById('generated-link').textContent = generatedLink;
+                document.getElementById('link-result').classList.add('show');
+                document.getElementById('share-whatsapp-btn').href = 'https://wa.me/?text=' + encodeURIComponent('Join using my link: ' + generatedLink);
+                showToast('Ready!');
+            } catch (e) { showToast(e.message, true); }
+            setLoading(btn, false);
+        });
+
+        async function copyText(t) { try { await navigator.clipboard.writeText(t); return true; } catch { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); document.body.removeChild(a); return true; } }
+        document.getElementById('copy-link-btn').addEventListener('click', async () => { if (await copyText(generatedLink)) { const b = document.getElementById('copy-link-btn'); b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy', 2000); } });
+        document.getElementById('copy-share-btn').addEventListener('click', () => copyText(generatedLink) && showToast('Copied!'));
+
+        async function loadLeaderboard() {
+            const l = document.getElementById('leaderboard-list');
+            try {
+                const d = await api('/leaderboard');
+                l.innerHTML = d.length ? d.map((r, i) => {
+                    const rk = i + 1, rc = rk === 1 ? 'rank-1' : rk === 2 ? 'rank-2' : rk === 3 ? 'rank-3' : 'rank-default', t = getTier(r.referral_count);
+                    return '<div class="leaderboard-item"><div class="rank ' + rc + '">' + rk + '</div><div class="leaderboard-info"><div class="leaderboard-name">' + esc(r.code) + '</div><div class="leaderboard-tier">' + (t ? t.n : 'Starter') + '</div></div><div class="leaderboard-count">' + r.referral_count + '</div></div>';
+                }).join('') : '<div class="empty-state">No referrals yet</div>';
+            } catch { l.innerHTML = '<div class="empty-state">Failed to load</div>'; }
+        }
+
+        function showLogin() { document.getElementById('admin-login').style.display = 'block'; document.getElementById('admin-dashboard').style.display = 'none'; }
+        function showDashboard() { document.getElementById('admin-login').style.display = 'none'; document.getElementById('admin-dashboard').style.display = 'block'; }
+        async function checkAuth() { try { await api('/admin/me'); showDashboard(); loadDashboard(); } catch { showLogin(); } }
+
+        document.getElementById('login-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            setLoading(btn, true);
+            try {
+                await api('/admin/login', { method: 'POST', body: JSON.stringify({ username: document.getElementById('admin-username').value.trim(), password: document.getElementById('admin-password').value }) });
+                document.getElementById('admin-password').value = '';
+                showDashboard(); loadDashboard(); showToast('Welcome!');
+            } catch (e) { showToast(e.message, true); }
+            setLoading(btn, false);
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => { try { await api('/admin/logout', { method: 'POST' }); } catch {} showLogin(); });
+
+        async function loadDashboard() { await Promise.all([loadStats(), loadReferrers()]); }
+        async function loadStats() {
+            try {
+                const s = await api('/admin/stats');
+                document.getElementById('stat-total').textContent = s.totalReferrals;
+                document.getElementById('stat-referrers').textContent = s.activeReferrers;
+                document.getElementById('stat-today').textContent = s.todayReferrals;
+                document.getElementById('stat-week').textContent = s.weekReferrals;
+                document.getElementById('stat-flagged').textContent = s.flaggedReferrers;
+            } catch {}
+        }
+
+        async function loadReferrers() {
+            const tbody = document.getElementById('referrers-table'), search = document.getElementById('search-input').value, flagged = document.getElementById('filter-flagged').value;
+            const params = new URLSearchParams(); if (search) params.set('search', search); if (flagged) params.set('flagged', flagged);
+            try {
+                const refs = await api('/admin/referrers?' + params);
+                if (!refs.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No data</td></tr>'; return; }
+                tbody.innerHTML = refs.map(r => {
+                    const t = getTier(r.referral_count), st = r.is_flagged ? '<span class="badge badge-flagged">Flagged</span>' : '<span style="color:var(--green-primary)">Active</span>';
+                    return '<tr><td><span class="referrer-code">' + esc(r.code) + '</span></td><td><span class="referral-count">' + r.referral_count + '</span></td><td>' + (t ? '<span class="badge ' + t.c + '">' + t.n + '</span>' : '-') + '</td><td>' + st + '</td><td>' + fmtDate(r.last_referral_at) + '</td><td><button class="action-btn flag" data-code="' + esc(r.code) + '" data-f="' + r.is_flagged + '">' + (r.is_flagged ? 'Unflag' : 'Flag') + '</button><button class="action-btn danger" data-code="' + esc(r.code) + '">Delete</button></td></tr>';
+                }).join('');
+                tbody.querySelectorAll('.action-btn.danger').forEach(b => b.addEventListener('click', () => { deleteCode = b.dataset.code; document.getElementById('delete-code').textContent = b.dataset.code; document.getElementById('delete-modal').classList.add('show'); }));
+                tbody.querySelectorAll('.action-btn.flag').forEach(b => b.addEventListener('click', () => { flagCode = b.dataset.code; flagState = b.dataset.f === 'true'; document.getElementById('flag-code').textContent = b.dataset.code; document.getElementById('flag-modal-title').textContent = flagState ? '✅ Unflag' : '🚩 Flag'; document.getElementById('flag-reason-group').style.display = flagState ? 'none' : 'block'; document.getElementById('flag-modal').classList.add('show'); }));
+            } catch { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Failed</td></tr>'; }
+        }
+
+        let searchTO; document.getElementById('search-input').addEventListener('input', () => { clearTimeout(searchTO); searchTO = setTimeout(loadReferrers, 300); });
+        document.getElementById('filter-flagged').addEventListener('change', loadReferrers);
+        document.getElementById('refresh-btn').addEventListener('click', () => { loadDashboard(); showToast('Refreshed'); });
+
+        // Quick paste - auto extract code from message
+        document.getElementById('quick-paste').addEventListener('input', async function() {
+            const msg = this.value;
+            const match = msg.match(/referred by\s+([A-Za-z0-9_]+)/i);
+            if (match) {
+                const code = match[1].toUpperCase();
+                this.value = '';
+                try {
+                    await api('/admin/referrals', { method: 'POST', body: JSON.stringify({ referrerCode: code }) });
+                    await loadDashboard();
+                    showToast('✅ Logged: ' + code);
+                } catch (e) { showToast(e.message, true); }
+            }
+        });
+
+        document.getElementById('log-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('log-btn');
+            setLoading(btn, true);
+            try {
+                await api('/admin/referrals', { method: 'POST', body: JSON.stringify({ referrerCode: document.getElementById('log-code').value.trim(), referredName: document.getElementById('log-name').value.trim(), referredPhone: document.getElementById('log-phone').value.trim() }) });
+                document.getElementById('log-code').value = ''; document.getElementById('log-name').value = ''; document.getElementById('log-phone').value = '';
+                await loadDashboard(); showToast('Logged!');
+            } catch (e) { showToast(e.message, true); }
+            setLoading(btn, false);
+        });
+
+        document.getElementById('export-csv-btn').addEventListener('click', async () => {
+            try { const b = await api('/admin/export/csv'), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = 'reflink.csv'; a.click(); URL.revokeObjectURL(u); showToast('Exported!'); } catch { showToast('Failed', true); }
+        });
+
+        let deleteCode = ''; document.getElementById('cancel-delete').addEventListener('click', () => document.getElementById('delete-modal').classList.remove('show'));
+        document.getElementById('confirm-delete').addEventListener('click', async () => { try { await api('/admin/referrers/' + encodeURIComponent(deleteCode), { method: 'DELETE' }); document.getElementById('delete-modal').classList.remove('show'); await loadDashboard(); showToast('Deleted'); } catch (e) { showToast(e.message, true); } });
+
+        let flagCode = '', flagState = false; document.getElementById('cancel-flag').addEventListener('click', () => document.getElementById('flag-modal').classList.remove('show'));
+        document.getElementById('confirm-flag').addEventListener('click', async () => { try { await api('/admin/referrers/' + encodeURIComponent(flagCode) + '/flag', { method: 'PATCH', body: JSON.stringify({ flagged: !flagState, reason: document.getElementById('flag-reason').value.trim() }) }); document.getElementById('flag-modal').classList.remove('show'); await loadDashboard(); showToast(flagState ? 'Unflagged' : 'Flagged'); } catch (e) { showToast(e.message, true); } });
+
+        document.getElementById('change-password-btn').addEventListener('click', () => { document.getElementById('password-modal').classList.add('show'); document.getElementById('current-password').value = ''; document.getElementById('new-password').value = ''; document.getElementById('confirm-password').value = ''; });
+        document.getElementById('cancel-password').addEventListener('click', () => document.getElementById('password-modal').classList.remove('show'));
+        document.getElementById('new-password').addEventListener('input', () => { const p = document.getElementById('new-password').value, b = document.getElementById('password-strength-bar'); b.className = 'password-strength-bar'; if (!p) return; let s = 0; if (p.length >= 12) s++; if (/[A-Z]/.test(p)) s++; if (/[a-z]/.test(p)) s++; if (/[0-9]/.test(p)) s++; if (/[^A-Za-z0-9]/.test(p)) s++; b.classList.add(s <= 2 ? 'strength-weak' : s === 3 ? 'strength-fair' : s === 4 ? 'strength-good' : 'strength-strong'); });
+        document.getElementById('password-form').addEventListener('submit', async e => { e.preventDefault(); const np = document.getElementById('new-password').value, cp = document.getElementById('confirm-password').value; if (np !== cp) { showToast('Passwords mismatch', true); return; } try { await api('/admin/change-password', { method: 'POST', body: JSON.stringify({ currentPassword: document.getElementById('current-password').value, newPassword: np }) }); document.getElementById('password-modal').classList.remove('show'); showToast('Changed!'); } catch (e) { showToast(e.message, true); } });
+
+        document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
+
+        (async () => { try { CONFIG = await api('/config'); } catch {} loadLeaderboard(); })();
+    })();
+    </script>
+</body>
+</html>
