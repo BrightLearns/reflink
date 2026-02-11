@@ -29,10 +29,10 @@ const CONFIG = {
         platinum: 20
     },
     // Security settings
-    maxReferralsPerHour: 10, // Max referrals that can be logged per hour per referrer
-    maxCodeGenerationsPerIP: 20, // Max codes per IP per day
-    minTimeBetweenReferrals: 60 * 1000, // 1 minute minimum between referrals for same referrer
-    suspiciousActivityThreshold: 50, // Flag accounts with more than this per day
+    maxReferralsPerHour: 100, // Max referrals that can be logged per hour per referrer
+    maxCodeGenerationsPerIP: 50, // Max codes per IP per day
+    minTimeBetweenReferrals: 5 * 1000, // 5 seconds minimum between referrals for same referrer
+    suspiciousActivityThreshold: 100, // Flag accounts with more than this per day
 };
 
 // Validate required environment variables
@@ -321,7 +321,7 @@ if (CONFIG.nodeEnv === 'production') {
 // Global rate limiting
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 500, // Increased for admin use
     message: { error: 'Too many requests, please try again later.' },
     standardHeaders: true,
     legacyHeaders: false,
